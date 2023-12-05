@@ -1,0 +1,84 @@
+FUNCTION_BLOCK microwave
+
+VAR_INPUT
+	sicaklik : REAL;
+	agirlik : REAL;
+	guc : REAL;
+	yiyecekTur : REAL;
+END_VAR
+
+VAR_OUTPUT
+	pismeSuresi : REAL;
+END_VAR
+
+//bulaniklastirma
+
+FUZZIFY sicaklik
+	TERM donmus := (-18,1)(-10,1)(0,0);
+	TERM normal := (-5,0)(22,1)(30,0);
+	TERM sicak := (24,0)(50,1)(70,1);
+END_FUZZIFY
+
+FUZZIFY agirlik
+	TERM hafif := (0,1)(400,0);
+	TERM ortaAgir := (300,0)(500,1)(700,0);
+	TERM agir := (600,0)(1000,1)(1500,1);
+END_FUZZIFY
+
+FUZZIFY guc
+	TERM dusuk := (0,0)(120,1)(180,1)(300,0);
+	TERM orta := (250,0)(450,1)(600,0);
+	TERM yuksek := (500,0)(600,1)(800,1);
+END_FUZZIFY
+
+FUZZIFY yiyecekTur
+	TERM kati := (0,1)(70,0);
+	TERM sivi := (50,0)(100,1)(140,0);
+END_FUZZIFY
+
+//durulama
+
+DEFUZZIFY pismeSuresi
+	TERM cokKisa := (0,0)(5,1)(10,0);
+	TERM kisa := (5,0)(13,1)(20,0); 
+	TERM normal := (10,0)(25,1)(40,0);
+	TERM uzun := (20,0)(35,1)(50,0); 
+	TERM cokUzun := (40,0)(60,1); 
+	
+	METHOD : COG;
+	DEFAULT := 25; 
+	
+END_DEFUZZIFY	
+	
+RULEBLOCK kuralBlok1
+		
+	AND : MIN; 
+	ACT : MIN;
+	ACCU : MAX;  
+		
+	RULE 1 : IF sicaklik IS donmus OR guc IS dusuk THEN pismeSuresi IS cokUzun; 
+	RULE 2 : IF sicaklik IS normal AND agirlik IS hafif AND guc IS orta AND yiyecekTur IS kati THEN pismeSuresi IS uzun; 
+	RULE 3 : IF sicaklik IS normal AND agirlik IS hafif AND guc IS orta AND yiyecekTur IS sivi THEN pismeSuresi IS normal; 
+	RULE 4 : IF sicaklik IS normal AND agirlik IS hafif AND guc IS yuksek AND yiyecekTur IS kati THEN pismeSuresi IS normal; 
+	RULE 5 : IF sicaklik IS normal AND agirlik IS hafif AND guc IS yuksek AND yiyecekTur IS sivi THEN pismeSuresi IS kisa; 
+	RULE 6 : IF sicaklik IS normal AND agirlik IS ortaAgir AND guc IS orta AND yiyecekTur IS kati THEN pismeSuresi IS cokUzun; 
+	RULE 7 : IF sicaklik IS normal AND agirlik IS ortaAgir AND guc IS orta AND yiyecekTur IS sivi THEN pismeSuresi IS uzun;	
+	RULE 8 : IF sicaklik IS normal AND agirlik IS ortaAgir AND guc IS yuksek AND yiyecekTur IS kati THEN pismeSuresi IS uzun; 
+	RULE 9 : IF sicaklik IS normal AND agirlik IS ortaAgir AND guc IS yuksek AND yiyecekTur IS sivi THEN pismeSuresi IS normal; 
+	RULE 10 : IF agirlik IS agir AND guc IS orta AND yiyecekTur IS kati THEN pismeSuresi IS cokUzun; 
+	RULE 11 : IF agirlik IS agir AND guc IS orta AND yiyecekTur IS sivi THEN pismeSuresi IS uzun; 
+	RULE 12 : IF sicaklik IS normal AND agirlik IS agir AND guc IS yuksek THEN pismeSuresi IS uzun;
+	RULE 13 : IF sicaklik IS sicak AND agirlik IS hafif AND guc IS orta AND yiyecekTur IS kati THEN pismeSuresi IS normal; 
+	RULE 14 : IF sicaklik IS sicak AND agirlik IS hafif AND guc IS orta AND yiyecekTur IS sivi THEN pismeSuresi IS kisa; 
+	RULE 15 : IF sicaklik IS sicak AND agirlik IS hafif AND guc IS yuksek AND yiyecekTur IS kati THEN pismeSuresi IS kisa; 
+	RULE 16 : IF sicaklik IS sicak AND agirlik IS hafif AND guc IS yuksek AND yiyecekTur IS sivi THEN pismeSuresi IS cokKisa; 
+	RULE 17 : IF sicaklik IS sicak AND agirlik IS ortaAgir AND guc IS orta AND yiyecekTur IS kati THEN pismeSuresi IS uzun; 
+	RULE 18 : IF sicaklik IS sicak AND agirlik IS ortaAgir AND guc IS orta AND yiyecekTur IS sivi THEN pismeSuresi IS normal; 
+	RULE 19 : IF sicaklik IS sicak AND agirlik IS ortaAgir AND guc IS yuksek AND yiyecekTur IS kati THEN pismeSuresi IS normal; 
+	RULE 20 : IF sicaklik IS sicak AND agirlik IS ortaAgir AND guc IS yuksek AND yiyecekTur IS sivi THEN pismeSuresi IS cokKisa; 
+	RULE 21 : IF sicaklik IS sicak AND agirlik IS agir AND guc IS yuksek THEN pismeSuresi IS normal; 
+	
+END_RULEBLOCK
+	
+
+END_FUNCTION_BLOCK
